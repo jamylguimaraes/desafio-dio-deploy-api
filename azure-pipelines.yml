@@ -10,7 +10,7 @@ pool:
   name: 'Default' # Usa o agente self-hosted
 
 variables:
-  solution: './APITempoDIO/APITempoDIO.sln'
+  solution: './APITempoDIO.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
