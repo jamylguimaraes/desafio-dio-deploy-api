@@ -1,0 +1,44 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  name: 'Default' # Usa o agente self-hosted
+
+variables:
+  solution: './APITempoDIO/APITempoDIO.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Install .Net SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'
+
+- script: |
+    echo "Verificando versão do .NET SDK..."
+    dotnet --version
+  displayName: 'Check .NET SDK Version'
+    
+- script: dotnet restore $(solution)
+  displayName: 'Restore Solution'
+
+- script: dotnet build $(solution) --configuration $(buildConfiguration)
+  displayName: 'Build Solution'
+
+- script: dotnet test $(solution) --configuration $(buildConfiguration) --no-build --collect:"Xplat Code Coverage"
+  displayName: 'Run Tests'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'ACR-Connection'
+    repository: 'api-dio-test'
+    command: 'buildAndPush'
+    dockerfile: './APITempoDIO/Dockerfile'
+    tags: 'latest'
